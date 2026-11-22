@@ -32,7 +32,7 @@ class EventController extends Controller
         return response()->json($event, 201);
     }
 
-    public function getEventById($id)
+    public function getEventById(int $id)
     {
         $event = $this->eventService->getEventById($id);
         return response()->json($event);
