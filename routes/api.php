@@ -11,6 +11,10 @@ Route::get('/user', function (Request $request) {
 Route::post('/events', [EventController::class, 'createEvent']);
 
 Route::post('/mock/webhooks/payments', function (Request $request) {
+    $fullURl = $request->fullUrl();
+    $query = $request->query();
+    $simulate = $request->query('simulate');
+    
     if ($request->query('simulate') === 'error') {
         return response()->json([
             'message' => 'Simulated failure'

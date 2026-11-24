@@ -14,8 +14,8 @@ class SendWebhookRequestJob implements ShouldQueue
 {
     use Queueable;
 
-    public int $tries = 3; 
-    public int $backoff = 5; 
+    public int $tries = 5; 
+    public int $backoff = 3; 
 
     /**
      * Create a new job instance.
@@ -34,7 +34,8 @@ class SendWebhookRequestJob implements ShouldQueue
         $responseCode = null; 
 
         try{
-            $response = Http::post(env('APP_URL'). '/api/mock/webhooks/payments',[]); 
+            $url = config('app.url') . '/api/mock/webhooks/payments?simulate=error';
+            $response = Http::post($url, []);
             $response->throw(); 
 
             $responseCode = $response->status();
@@ -44,7 +45,7 @@ class SendWebhookRequestJob implements ShouldQueue
 
             DeliveryAttempt::create([
                 'event_id' => $this->eventId,
-                'status' => 'delivered',
+                'status' => StatusEnum::DELIVERED->value,
                 'attempt_number' => $attempts,
                 'url' => $url,
                 'response_code' => $responseCode,
@@ -60,7 +61,7 @@ class SendWebhookRequestJob implements ShouldQueue
 
             DeliveryAttempt::create([
                 'event_id' => $this->eventId,
-                'status' => 'failed',
+                'status' => StatusEnum::FAILED->value,
                 'attempt_number' => $attempts,
                 'url' => $url,
                 'response_code' => $responseCode,
